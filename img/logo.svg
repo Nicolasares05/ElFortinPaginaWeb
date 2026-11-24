@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <!-- Logo recreado de "El Fortín · centro de copiado".
+       Para usar el logo original, guardalo como img/logo.png y cambiá "logo.svg" por "logo.png" en los .html -->
+  <circle cx="100" cy="100" r="96" fill="#fff" stroke="#2B3445" stroke-width="6"/>
+  <g font-family="'Arial Black','Archivo Black',Impact,'Helvetica Neue',Arial,sans-serif" font-weight="900" text-anchor="middle">
+    <text x="100" y="78" font-size="44" fill="#1F3C8F" letter-spacing="1">EL</text>
+    <text x="100" y="121" font-size="44" fill="#1F3C8F" letter-spacing="1" textLength="150" lengthAdjust="spacingAndGlyphs">FORTIN</text>
+  </g>
+  <g font-family="'Arial Rounded MT Bold','Trebuchet MS',Arial,sans-serif" font-weight="700" text-anchor="middle" fill="#F26A21">
+    <text x="100" y="146" font-size="23">centro</text>
+    <text x="100" y="169" font-size="23">de copiado</text>
+  </g>
+</svg>
