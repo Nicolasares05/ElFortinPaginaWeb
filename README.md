@@ -41,7 +41,7 @@ En `js/config.js` cambiá el número de WhatsApp, el teléfono, el email, la dir
 
 Los textos de la portada, "Nosotros", etc. están en `index.html`.
 
-**Logo:** `img/logo.svg` es una recreación del logo. Si tenés el archivo original, guardalo como `img/logo.png` y reemplazá `img/logo.svg` por `img/logo.png` en `index.html`, `admin.html` y `js/main.js`.
+**Logo:** `img/logo.svg` es el logo en vector (tipografías convertidas a trazos, se ve nítido en cualquier tamaño). Los colores son azul `#2A3482` y naranja `#E8642E`.
 
 ## 3. Publicar la página (gratis)
 
