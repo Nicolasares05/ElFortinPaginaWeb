@@ -88,6 +88,8 @@
         <button type="button" class="modal__close" data-close aria-label="Cerrar">✕</button>
       </div>
       <div class="drawer__body">
+        <label>Nombre del producto *<input name="name" required maxlength="120" placeholder="Ej: Anillado hasta 100 hojas" /></label>
+        <label class="field-label">Foto</label>
         <div class="drop" id="drop" tabindex="0" role="button" aria-label="Subir foto">
           <img id="preview" alt="" hidden />
           <div class="drop__hint" id="dropHint">
@@ -101,7 +103,6 @@
           <button type="button" class="link link--danger" id="removeImg">Quitar foto</button>
         </div>
 
-        <label>Nombre *<input name="name" required maxlength="120" placeholder="Ej: Anillado hasta 100 hojas" /></label>
         <div class="form__row">
           <label>Categoría<input name="category" list="cats" maxlength="60" placeholder="Ej: Encuadernación" /></label>
           <label>Precio ($)<input name="price" type="number" min="0" step="1" inputmode="numeric" placeholder="Vacío = Consultar" /></label>

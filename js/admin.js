@@ -124,6 +124,8 @@
     pendingFile = null;
     imageUrl = p?.image_url || null;
     form.reset();
+    form.name.classList.remove("is-invalid");
+    $(".drawer__body").scrollTop = 0;
     $("#formError").textContent = "";
     $("#edTitle").textContent = p ? "Editar producto" : "Nuevo producto";
     form.name.value = p?.name || "";
@@ -171,7 +173,14 @@
     e.preventDefault();
     $("#formError").textContent = "";
     const name = form.name.value.trim();
-    if (!name) { $("#formError").textContent = "El nombre es obligatorio."; form.name.focus(); return; }
+    form.name.classList.remove("is-invalid");
+    if (!name) {
+      $("#formError").textContent = "Falta el nombre del producto (primer campo de arriba).";
+      form.name.classList.add("is-invalid");
+      form.name.scrollIntoView({ behavior: "smooth", block: "center" });
+      form.name.focus({ preventScroll: true });
+      return;
+    }
     const priceRaw = form.price.value.trim();
     if (priceRaw !== "" && (isNaN(Number(priceRaw)) || Number(priceRaw) < 0)) {
       $("#formError").textContent = "El precio tiene que ser un número positivo."; form.price.focus(); return;
