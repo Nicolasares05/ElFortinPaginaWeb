@@ -4,6 +4,7 @@ Página web de El Fortín con **panel de administración**. El dueño entra a `/
 
 - **Página pública** (`index.html`): portada, destacados, catálogo con buscador y filtros por categoría, sección "Nosotros", contacto por WhatsApp y diseño adaptado a celular.
 - **Panel** (`admin.html`): acceso con email y contraseña, alta, edición y borrado de productos, subida de fotos (se comprimen solas), destacados y control de stock.
+- **Actualizar precios en masa**: desde el panel, botón *“% Actualizar precios”*. Se elige una marca (ej: BIC), una categoría o todos los productos, se pone el porcentaje de aumento o rebaja y el redondeo. Muestra una vista previa antes de aplicar y guarda un historial con botón **Deshacer**. Probado con 500.000 productos: tarda unos segundos.
 - **Tecnología**: HTML, CSS y JavaScript puros, sin compilar nada. Los datos, las fotos y el login van en [Supabase](https://supabase.com), que tiene plan gratis.
 
 ---

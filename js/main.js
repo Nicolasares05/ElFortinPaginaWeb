@@ -47,7 +47,7 @@
         ${p.available === false ? `<span class="badge badge--out">Sin stock</span>` : p.featured ? `<span class="badge">Destacado</span>` : ""}
       </div>
       <div class="product__body">
-        ${p.category ? `<span class="product__cat">${esc(p.category)}</span>` : ""}
+        ${p.brand || p.category ? `<span class="product__cat">${esc([p.brand, p.category].filter(Boolean).join(" · "))}</span>` : ""}
         <h3>${esc(p.name)}</h3>
         <div class="product__foot">
           <span class="product__price ${p.price == null ? "is-ask" : ""}">${price(p.price)}</span>
@@ -85,7 +85,7 @@
     const q = state.q.trim().toLowerCase();
     let list = products.filter((p) =>
       (state.cat === "Todos" || p.category === state.cat) &&
-      (!q || `${p.name} ${p.description || ""} ${p.category || ""}`.toLowerCase().includes(q)));
+      (!q || `${p.name} ${p.brand || ""} ${p.description || ""} ${p.category || ""}`.toLowerCase().includes(q)));
     const num = (v) => (v == null ? Infinity : Number(v));
     if (state.sort === "price-asc") list.sort((a, b) => num(a.price) - num(b.price));
     if (state.sort === "price-desc") list.sort((a, b) => (b.price ?? -1) - (a.price ?? -1));
@@ -136,7 +136,7 @@
     lastFocus = document.activeElement;
     $("#mImg").src = p.image_url || "img/logo.svg";
     $("#mImg").alt = p.name;
-    $("#mCat").textContent = p.category || "Producto";
+    $("#mCat").textContent = [p.brand, p.category].filter(Boolean).join(" · ") || "Producto";
     $("#mTitle").textContent = p.name;
     $("#mPrice").textContent = price(p.price);
     $("#mDesc").textContent = p.description || "";

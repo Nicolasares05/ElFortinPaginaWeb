@@ -55,7 +55,10 @@
           <h1>Productos</h1>
           <p class="muted">Lo que cargues acá aparece en la página al instante.</p>
         </div>
-        <button class="btn btn--accent" id="newBtn">+ Nuevo producto</button>
+        <div class="a-title__btns">
+          <button class="btn btn--outline" id="bulkBtn">% Actualizar precios</button>
+          <button class="btn btn--accent" id="newBtn">+ Nuevo producto</button>
+        </div>
       </div>
 
       <div class="stats">
@@ -104,10 +107,12 @@
         </div>
 
         <div class="form__row">
-          <label>Categoría<input name="category" list="cats" maxlength="60" placeholder="Ej: Encuadernación" /></label>
-          <label>Precio ($)<input name="price" type="number" min="0" step="1" inputmode="numeric" placeholder="Vacío = Consultar" /></label>
+          <label>Marca<input name="brand" list="brands" maxlength="60" placeholder="Ej: BIC" /></label>
+          <label>Categoría<input name="category" list="cats" maxlength="60" placeholder="Ej: Librería" /></label>
         </div>
+        <label>Precio ($)<input name="price" type="number" min="0" step="1" inputmode="numeric" placeholder="Vacío = Consultar" /></label>
         <datalist id="cats"></datalist>
+        <datalist id="brands"></datalist>
         <label>Descripción<textarea name="description" rows="5" maxlength="2000" placeholder="Detalles, medidas, condiciones..."></textarea></label>
 
         <div class="toggles">
@@ -123,12 +128,63 @@
     </form>
   </div>
 
+  <!-- Actualización masiva de precios -->
+  <div class="modal" id="bulk" hidden>
+    <div class="modal__backdrop" data-bclose></div>
+    <form class="bulk card form" id="bulkForm" novalidate>
+      <div class="bulk__head">
+        <div>
+          <h2>Actualizar precios</h2>
+          <p class="muted">Subí o bajá un porcentaje a muchos productos a la vez.</p>
+        </div>
+        <button type="button" class="modal__close" data-bclose aria-label="Cerrar">✕</button>
+      </div>
+      <div class="form__row">
+        <label>Aplicar a
+          <select name="scope">
+            <option value="brand">Una marca</option>
+            <option value="category">Una categoría</option>
+            <option value="all">Todos los productos</option>
+          </select>
+        </label>
+        <label id="valueWrap"><span id="valueLabel">Marca</span><select name="value"></select></label>
+      </div>
+      <div class="form__row">
+        <label>Tipo
+          <select name="dir">
+            <option value="up">Aumento ▲</option>
+            <option value="down">Rebaja ▼</option>
+          </select>
+        </label>
+        <label>Porcentaje (%)<input name="percent" type="number" min="0.1" max="500" step="0.1" inputmode="decimal" placeholder="Ej: 5" /></label>
+      </div>
+      <label>Redondear el precio final
+        <select name="round">
+          <option value="1">Al peso (sin centavos)</option>
+          <option value="10">A $10</option>
+          <option value="50">A $50</option>
+          <option value="100">A $100</option>
+        </select>
+      </label>
+      <div class="bulk__preview" id="bulkPreview" aria-live="polite"></div>
+      <p class="form-error" id="bulkError" role="alert"></p>
+      <div class="bulk__btns">
+        <button type="button" class="btn btn--outline" data-bclose>Cerrar</button>
+        <button type="submit" class="btn btn--primary" id="bulkApply" disabled>Aplicar</button>
+      </div>
+      <div class="bulk__hist">
+        <h3>Últimos cambios de precios</h3>
+        <div id="bulkHist"></div>
+      </div>
+    </form>
+  </div>
+
   <!-- Confirmación -->
   <div class="modal" id="confirm" hidden>
     <div class="modal__backdrop" data-cancel></div>
     <div class="confirm card" role="alertdialog" aria-modal="true" aria-labelledby="cfText">
       <h3 id="cfText">¿Eliminar producto?</h3>
-      <p class="muted">Esta acción no se puede deshacer.</p>
+      <p class="muted" id="cfSub">Esta acción no se puede deshacer.</p>
       <div class="confirm__btns">
         <button class="btn btn--outline" data-cancel>Cancelar</button>
         <button class="btn btn--danger" id="cfOk">Eliminar</button>

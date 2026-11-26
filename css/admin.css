@@ -116,3 +116,31 @@ body.admin { background: var(--blue-50); min-height: 100vh; }
 
 .field-label { margin-bottom: -.6rem; }
 .form input.is-invalid { border-color: var(--danger); box-shadow: 0 0 0 4px #FEE2E2; }
+
+/* Actualización masiva de precios */
+.a-title__btns { display: flex; gap: .6rem; flex-wrap: wrap; }
+#bulk { place-items: center; padding: 16px; }
+.bulk { position: relative; width: min(560px, 100%); max-height: calc(100vh - 32px); overflow: auto; animation: pop .25s var(--ease); }
+.bulk__head { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; }
+.bulk__head h2 { font-size: 1.4rem; margin: 0; }
+.bulk__head p { margin: .2rem 0 0; font-size: .9rem; }
+.bulk__head .modal__close { position: static; flex: none; box-shadow: none; background: var(--blue-50); }
+.bulk__preview { background: var(--blue-50); border-radius: 14px; padding: 1rem 1.1rem; font-size: .92rem; }
+.bulk__preview:empty { display: none; }
+.bulk__preview b { color: var(--ink); }
+.bulk__preview ul { list-style: none; padding: 0; margin: .6rem 0 0; display: grid; gap: .35rem; }
+.bulk__preview li { display: flex; justify-content: space-between; gap: 1rem; font-size: .88rem; }
+.bulk__preview li span:first-child { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bulk__preview .old { color: var(--muted); text-decoration: line-through; margin-right: .4rem; }
+.bulk__preview .new { font-weight: 800; color: var(--blue-700); }
+.bulk__preview .new.is-down { color: var(--ok); }
+.bulk__btns { display: flex; justify-content: flex-end; gap: .6rem; }
+.bulk__hist { border-top: 1px solid var(--line); padding-top: 1rem; }
+.bulk__hist h3 { font-size: .95rem; margin-bottom: .6rem; }
+.hist-row { display: flex; justify-content: space-between; align-items: center; gap: .8rem; padding: .6rem 0; border-bottom: 1px solid var(--line); font-size: .86rem; }
+.hist-row:last-child { border-bottom: 0; }
+.hist-row b { color: var(--ink); }
+.hist-row .pct-up { color: var(--orange-600); font-weight: 800; }
+.hist-row .pct-down { color: var(--ok); font-weight: 800; }
+.hist-row.is-reverted { opacity: .55; }
+.hist-row .btn { flex: none; }

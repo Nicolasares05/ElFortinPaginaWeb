@@ -16,7 +16,7 @@
   }
 
   // ---------- Utilidades ----------
-  const FIELDS = ["name", "description", "price", "category", "image_url", "featured", "available"];
+  const FIELDS = ["name", "description", "price", "brand", "category", "image_url", "featured", "available"];
   const clean = (p) => {
     const o = {};
     FIELDS.forEach((k) => { if (k in p) o[k] = p[k]; });
@@ -63,16 +63,49 @@
     { name: "Impresión de planos A3", category: "Impresiones", price: null, featured: false, available: true,
       description: "Sin precio cargado: se muestra como \"Consultar\".\n\n(Ejemplo)",
       image_url: placeholder("Planos A3", "print", "#1D4ED8", "#F26A21") },
-    { name: "Resma A4 75 g (500 hojas)", category: "Librería", price: 9500, featured: false, available: true,
+    { name: "Resma A4 75 g (500 hojas)", brand: "Ledesma", category: "Librería", price: 9500, featured: false, available: true,
       description: "Resma de papel A4 para impresora y fotocopiadora.\n\n(Ejemplo)",
       image_url: placeholder("Resma A4", "box", "#475569", "#1E293B") },
+    { name: "Birome BIC Cristal azul", brand: "BIC", category: "Librería", price: 500, featured: false, available: true,
+      description: "Birome trazo medio, tinta azul.\n\n(Ejemplo: probá \"Actualizar precios\" con la marca BIC)",
+      image_url: placeholder("BIC Cristal", "pen", "#1F3C8F", "#2563EB") },
+    { name: "Corrector BIC en lápiz", brand: "BIC", category: "Librería", price: 1800, featured: false, available: true,
+      description: "Corrector líquido en lápiz, punta metálica.\n\n(Ejemplo)",
+      image_url: placeholder("BIC Corrector", "pen", "#0F766E", "#1F3C8F") },
+    { name: "Resaltador BIC amarillo", brand: "BIC", category: "Librería", price: 1200, featured: false, available: true,
+      description: "Resaltador fluo punta biselada.\n\n(Ejemplo)",
+      image_url: placeholder("BIC Resaltador", "pen", "#CA8A04", "#C2410C") },
+    { name: "Lápiz negro HB", brand: "Faber-Castell", category: "Librería", price: 450, featured: false, available: true,
+      description: "Lápiz grafito HB.\n\n(Ejemplo)",
+      image_url: placeholder("Lápiz HB", "pen", "#166534", "#14532D") },
     { name: "Kit escolar de librería", category: "Librería", price: 12900, featured: false, available: false,
       description: "Marcado como sin stock: se ve en la página con la etiqueta correspondiente.\n\n(Ejemplo)",
       image_url: placeholder("Kit escolar", "pen", "#F26A21", "#1F3C8F") },
   ].map((p, i) => ({ ...p, id: "demo-" + i, created_at: new Date(now - i * 3600e3).toISOString() }));
 
-  const DEMO_KEY = "fortin_demo_products_v2";
+  const DEMO_KEY = "fortin_demo_products_v3";
   const DEMO_SESSION = "fortin_demo_session";
+  const DEMO_BATCHES = "fortin_demo_batches_v1";
+  const same = (a, b) => String(a || "").trim().toLowerCase() === String(b || "").trim().toLowerCase();
+  const matches = (p, f) => p.price !== null && p.price !== undefined && p.price !== "" &&
+    (!f.brand || same(p.brand, f.brand)) && (!f.category || same(p.category, f.category));
+  function batchesLoad() {
+    try { return JSON.parse(localStorage.getItem(DEMO_BATCHES)) || []; } catch (e) { return []; }
+  }
+  function batchesSave(list) {
+    try { localStorage.setItem(DEMO_BATCHES, JSON.stringify(list.slice(0, 20))); } catch (e) { /* ignorar */ }
+  }
+  function groupCount(list, key) {
+    const m = new Map();
+    list.forEach((p) => {
+      const v = String(p[key] || "").trim();
+      if (!v) return;
+      const k = v.toLowerCase();
+      if (!m.has(k)) m.set(k, { name: v, total: 0 });
+      m.get(k).total++;
+    });
+    return [...m.values()].sort((a, b) => a.name.localeCompare(b.name, "es"));
+  }
 
   function demoLoad() {
     try {
@@ -192,6 +225,81 @@
       await sb.storage.from(cfg.storageBucket).remove([decodeURIComponent(url.slice(i + marker.length))]);
     },
 
+    // --- Actualización masiva de precios ---
+    async priceFacets() {
+      if (isDemo) {
+        const list = demoLoad();
+        return { brands: groupCount(list, "brand"), categories: groupCount(list, "category") };
+      }
+      const { data, error } = await sb.rpc("product_facets");
+      if (error) throw error;
+      return data;
+    },
+
+    async previewPriceUpdate({ brand = null, category = null }) {
+      if (isDemo) {
+        const list = demoLoad().filter((p) => matches(p, { brand, category }));
+        const sample = [...list].sort((a, b) => a.name.localeCompare(b.name, "es")).slice(0, 3)
+          .map((p) => ({ name: p.name, price: p.price }));
+        return { total: list.length, sample };
+      }
+      const { data, error } = await sb.rpc("preview_price_update", { p_brand: brand, p_category: category });
+      if (error) throw error;
+      return data;
+    },
+
+    async applyPriceUpdate({ brand = null, category = null, percent, round = 1 }) {
+      if (isDemo) {
+        const list = demoLoad();
+        const r = Math.max(Number(round) || 1, 1);
+        const old = {};
+        list.forEach((p) => {
+          if (!matches(p, { brand, category })) return;
+          old[p.id] = p.price;
+          p.price = Math.max(Math.round((Number(p.price) * (1 + percent / 100)) / r) * r, 0);
+        });
+        demoSave(list);
+        const batch = {
+          id: Date.now(), created_at: new Date().toISOString(), percent, reverted_at: null,
+          description: brand ? `Marca: ${brand}` : category ? `Categoría: ${category}` : "Todos los productos",
+          affected: Object.keys(old).length, old,
+        };
+        batchesSave([batch, ...batchesLoad()]);
+        return { batch_id: batch.id, affected: batch.affected };
+      }
+      const { data, error } = await sb.rpc("apply_price_update", {
+        p_brand: brand, p_category: category, p_percent: percent, p_round: round,
+      });
+      if (error) throw error;
+      return data;
+    },
+
+    async listPriceBatches() {
+      if (isDemo) return batchesLoad().slice(0, 10).map(({ old, ...b }) => b);
+      const { data, error } = await sb.from("price_batches").select("*").order("id", { ascending: false }).limit(10);
+      if (error) throw error;
+      return data;
+    },
+
+    async revertPriceUpdate(batchId) {
+      if (isDemo) {
+        const batches = batchesLoad();
+        const b = batches.find((x) => String(x.id) === String(batchId));
+        if (!b || b.reverted_at) throw new Error("Ese cambio ya fue deshecho o no existe.");
+        if (batches.some((x) => x.id > b.id && !x.reverted_at)) throw new Error("Primero deshacé los cambios más recientes.");
+        const list = demoLoad();
+        let n = 0;
+        list.forEach((p) => { if (p.id in b.old) { p.price = b.old[p.id]; n++; } });
+        demoSave(list);
+        b.reverted_at = new Date().toISOString();
+        batchesSave(batches);
+        return n;
+      }
+      const { data, error } = await sb.rpc("revert_price_update", { p_batch: Number(batchId) });
+      if (error) throw error;
+      return data;
+    },
+
     // --- Autenticación ---
     async getSession() {
       if (isDemo) {
@@ -221,7 +329,7 @@
     },
 
     async resetDemo() {
-      try { localStorage.removeItem(DEMO_KEY); } catch (e) { /* ignorar */ }
+      try { localStorage.removeItem(DEMO_KEY); localStorage.removeItem(DEMO_BATCHES); } catch (e) { /* ignorar */ }
     },
   };
 
